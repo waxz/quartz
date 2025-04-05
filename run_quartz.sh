@@ -32,8 +32,8 @@ sudo nginx -t && sudo systemctl reload nginx
 # run app
 
 npm i
-npx quartz build --serve --port 8002
-
+#npx quartz build --serve --port 8002
+npx quartz build --serve --watch --port 8002  -d $DIR/content
 
 echo "commit github update"
 
