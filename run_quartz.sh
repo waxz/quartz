@@ -35,7 +35,7 @@ echo QUARTZ_DOMAIN $QUARTZ_DOMAIN
 echo QUARTZ_USER $QUARTZ_USER
 echo QUARTZ_PSW $QUARTZ_PSW
 
-sudo htpasswd -b /etc/nginx/.htpasswd $QUARTZ_USER $QUARTZ_PSW
+sudo htpasswd -bcB -C 10 /etc/nginx/.htpasswd $QUARTZ_USER $QUARTZ_PSW
 
 
 sudo cp $DIR/default.conf /etc/nginx/conf.d/default.conf
