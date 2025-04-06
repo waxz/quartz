@@ -5,7 +5,7 @@ sudo npm i npm@11.2.0 -g
 
 # nginx
 sudo apt update
-sudo apt install nginx
+sudo apt install -y nginx apache2-utils
 
 if [[ -f /etc/nginx/sites-enabled/default ]] ; then sudo unlink /etc/nginx/sites-enabled/default ;fi
 sudo mkdir -p /etc/nginx/locations
@@ -25,9 +25,18 @@ if [[ ! -z "$QUARTZ_PORT" ]]; then echo QUARTZ_PORT $QUARTZ_PORT; else QUARTZ_PO
 if [[ ! -z "$QUARTZ_CONTENT" ]]; then echo QUARTZ_CONTENT $QUARTZ_CONTENT; else QUARTZ_CONTENT=$DIR/content ;fi
 if [[ ! -z "$QUARTZ_DOMAIN" ]]; then echo QUARTZ_DOMAIN $QUARTZ_DOMAIN; else QUARTZ_DOMAIN=quartz ;fi
 
+if [[ ! -z "$QUARTZ_USER" ]]; then echo QUARTZ_USER $QUARTZ_USER; else QUARTZ_USER=quartz ;fi
+if [[ ! -z "$QUARTZ_PSW" ]]; then echo QUARTZ_PSW $QUARTZ_PSW; else QUARTZ_PSW=quartz ;fi
+
 echo QUARTZ_PORT $QUARTZ_PORT
 echo QUARTZ_CONTENT $QUARTZ_CONTENT
 echo QUARTZ_DOMAIN $QUARTZ_DOMAIN
+
+echo QUARTZ_USER $QUARTZ_USER
+echo QUARTZ_PSW $QUARTZ_PSW
+
+sudo htpasswd -b /etc/nginx/.htpasswd $QUARTZ_USER $QUARTZ_PSW
+
 
 sudo cp $DIR/default.conf /etc/nginx/conf.d/default.conf
 #sudo cp $DIR/location-*.conf /etc/nginx/locations/

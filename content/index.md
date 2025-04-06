@@ -29,5 +29,7 @@ npx quartz build --serve --watch --port $QUARTZ_PORT  -d $QUARTZ_CONTENT
 export QUARTZ_PORT=8003
 export QUARTZ_CONTENT=./content/
 export QUARTZ_DOMAIN=quartz-public
+export QUARTZ_USER=quartz
+export QUARTZ_PSW=quartz
 ./run_quartz.sh
 ```
