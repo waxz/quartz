@@ -21,29 +21,38 @@ done
 DIR=$( cd -P "$( dirname "$SOURCE" )" >/dev/null 2>&1 && pwd )
 
 # env 
-if [[ ! -z "$QUARTZ_PORT" ]]; then echo QUARTZ_PORT $QUARTZ_PORT; else QUARTZ_PORT=8000 ;fi
-if [[ ! -z "$QUARTZ_CONTENT" ]]; then echo QUARTZ_CONTENT $QUARTZ_CONTENT; else QUARTZ_CONTENT=$DIR/content ;fi
-if [[ ! -z "$QUARTZ_DOMAIN" ]]; then echo QUARTZ_DOMAIN $QUARTZ_DOMAIN; else QUARTZ_DOMAIN=quartz ;fi
 
-if [[ ! -z "$QUARTZ_USER" ]]; then echo QUARTZ_USER $QUARTZ_USER; else QUARTZ_USER=quartz ;fi
-if [[ ! -z "$QUARTZ_PSW" ]]; then echo QUARTZ_PSW $QUARTZ_PSW; else QUARTZ_PSW=quartz ;fi
+PORT=8000
+CONTENT=$DIR/content
 
-echo QUARTZ_PORT $QUARTZ_PORT
-echo QUARTZ_CONTENT $QUARTZ_CONTENT
-echo QUARTZ_DOMAIN $QUARTZ_DOMAIN
+NGINX_DOMAIN=quartz
+NGINX_USER=quartz
+NGINX_PSW=quartz
 
-echo QUARTZ_USER $QUARTZ_USER
-echo QUARTZ_PSW $QUARTZ_PSW
 
-if [ ! -f /etc/nginx/.htpasswd ]; then sudo htpasswd -bcB -C 10 /etc/nginx/.htpasswd $QUARTZ_USER $QUARTZ_PSW ; else sudo htpasswd -bB -C 10 /etc/nginx/.htpasswd $QUARTZ_USER $QUARTZ_PSW ;fi
+if [[ ! -z "$QUARTZ_PORT" ]]; then PORT=$QUARTZ_PORT;fi
+if [[ ! -z "$QUARTZ_CONTENT" ]]; then CONTENT=$QUARTZ_CONTENT;fi
+if [[ ! -z "$QUARTZ_DOMAIN" ]]; then NGINX_DOMAIN=$QUARTZ_DOMAIN ;fi
+
+if [[ ! -z "$QUARTZ_USER" ]]; then NGINX_USER=$QUARTZ_USER; fi
+if [[ ! -z "$QUARTZ_PSW" ]]; then NGINX_PSW=$QUARTZ_PSW;fi
+
+echo PORT $PORT
+echo CONTENT $CONTENT
+echo NGINX_DOMAIN $NGINX_DOMAIN
+
+echo NGINX_USER $NGINX_USER
+echo NGINX_PSW $NGINX_PSW
+
+if [ ! -f /etc/nginx/.htpasswd ]; then sudo htpasswd -bcB -C 10 /etc/nginx/.htpasswd $NGINX_USER $NGINX_PSW ; else sudo htpasswd -bB -C 10 /etc/nginx/.htpasswd $NGINX_USER $NGINX_PSW ;fi
 
 
 
 sudo cp $DIR/default.conf /etc/nginx/conf.d/default.conf
 #sudo cp $DIR/location-*.conf /etc/nginx/locations/
 
-sed "/proxy_pass/s/127.0.0.1:[0-9]\+/127.0.0.1:$QUARTZ_PORT/"  $DIR/location-quartz.conf  | sudo tee /etc/nginx/locations/location-quartz-$QUARTZ_DOMAIN.conf
-sudo sed -i "/quartz/s/quartz/$QUARTZ_DOMAIN/" /etc/nginx/locations/location-quartz-$QUARTZ_DOMAIN.conf
+sed "/proxy_pass/s/127.0.0.1:[0-9]\+/127.0.0.1:$PORT/"  $DIR/location-quartz.conf  | sudo tee /etc/nginx/locations/location-quartz-$NGINX_DOMAIN.conf
+sudo sed -i "/quartz/s/quartz/$NGINX_DOMAIN/" /etc/nginx/locations/location-quartz-$NGINX_DOMAIN.conf
 
 sudo service nginx restart
 sudo nginx -t && sudo systemctl reload nginx
@@ -52,9 +61,9 @@ sudo nginx -t && sudo systemctl reload nginx
 
 # npm i --prefix $DIR
 
-# cd $DIR &&  npx quartz build  --serve --watch --port $QUARTZ_PORT  -d $QUARTZ_CONTENT
+# cd $DIR &&  npx quartz build  --serve --watch --port $PORT  -d $CONTENT
 
-docker run -v $QUARTZ_CONTENT:$QUARTZ_CONTENT -v $DIR:$DIR -w $DIR -p $QUARTZ_PORT:$QUARTZ_PORT --rm  node:22  bash -c "npm install -g npm@11.2.0 && npm i && npx quartz build  --serve --watch --port $QUARTZ_PORT  -d $QUARTZ_CONTENT"
+docker run -v $CONTENT:$CONTENT -v $DIR:$DIR -w $DIR -p $PORT:$PORT --rm  node:22  bash -c "npm install -g npm@11.2.0 && npm i && npx quartz build  --serve --watch --port $PORT  -d $CONTENT"
 
 #echo "commit github update"
 
