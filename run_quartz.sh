@@ -49,10 +49,11 @@ sudo nginx -t && sudo systemctl reload nginx
 
 # run app
 
-npm i --prefix $DIR
+# npm i --prefix $DIR
 
-cd $DIR &&  npx quartz build  --serve --watch --port $QUARTZ_PORT  -d $QUARTZ_CONTENT
+# cd $DIR &&  npx quartz build  --serve --watch --port $QUARTZ_PORT  -d $QUARTZ_CONTENT
 
+docker run -v $QUARTZ_CONTENT:$QUARTZ_CONTENT -v $DIR:$DIR -w $DIR -p $QUARTZ_PORT:$QUARTZ_PORT --rm -it node:22  bash -c "npm install -g npm@11.2.0 && npm i && npx quartz build  --serve --watch --port $QUARTZ_PORT  -d $QUARTZ_CONTENT"
 
 #echo "commit github update"
 
