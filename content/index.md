@@ -28,6 +28,6 @@ npx quartz build --serve --watch --port $QUARTZ_PORT  -d $QUARTZ_CONTENT
 ```bash
 export QUARTZ_PORT=8003
 export QUARTZ_CONTENT=./content/
-
+export QUARTZ_DOMAIN=quartz-public
 ./run_quartz.sh
 ```
