@@ -4,8 +4,9 @@
 #sudo npm i npm@11.2.0 -g
 
 # nginx
-sudo apt update
-sudo apt install -y nginx apache2-utils
+if ! which nginx &>/dev/null; then
+    sudo apt update && sudo apt install nginx apache2-utils
+fi
 
 if [[ -f /etc/nginx/sites-enabled/default ]]; then sudo unlink /etc/nginx/sites-enabled/default; fi
 sudo mkdir -p /etc/nginx/locations
