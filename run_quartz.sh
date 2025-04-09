@@ -5,7 +5,7 @@
 
 # nginx
 if ! which nginx &>/dev/null; then
-    sudo apt update && sudo apt install nginx apache2-utils
+  sudo apt update && sudo apt install nginx apache2-utils
 fi
 
 if [[ -f /etc/nginx/sites-enabled/default ]]; then sudo unlink /etc/nginx/sites-enabled/default; fi
@@ -50,16 +50,28 @@ if [[ ! -z "$QUARTZ_DOMAIN" ]]; then NGINX_DOMAIN=$QUARTZ_DOMAIN; fi
 if [[ ! -z "$QUARTZ_USER" ]]; then NGINX_USER=$QUARTZ_USER; fi
 if [[ ! -z "$QUARTZ_PSW" ]]; then NGINX_PSW=$QUARTZ_PSW; fi
 
+CONATINER_NAME=$PROJECT-$NGINX_DOMAIN
+
 echo PORT $PORT
 echo CONTENT $CONTENT
 echo NGINX_DOMAIN $NGINX_DOMAIN
 
 echo NGINX_USER $NGINX_USER
 echo NGINX_PSW $NGINX_PSW
+echo CONATINER_NAME $CONATINER_NAME
 
 if [ ! -f /etc/nginx/.htpasswd ]; then sudo htpasswd -bcB -C 10 /etc/nginx/.htpasswd $NGINX_USER $NGINX_PSW; else sudo htpasswd -bB -C 10 /etc/nginx/.htpasswd $NGINX_USER $NGINX_PSW; fi
 
-sudo cp $DIR/default.conf /etc/nginx/conf.d/default.conf
+if [ "$NGINX_OVERWRITE_CONF" == "true" ]; then
+  sudo cp $DIR/default.conf /etc/nginx/conf.d/default.conf
+
+else
+
+  if [ ! -f "/etc/nginx/conf.d/default.conf" ]; then
+    sudo cp $DIR/default.conf /etc/nginx/conf.d/default.conf
+  fi
+fi
+
 #sudo cp $DIR/location-*.conf /etc/nginx/locations/
 
 sed "/proxy_pass/s/127.0.0.1:[0-9]\+/127.0.0.1:$PORT/" $DIR/location-quartz.conf | sudo tee /etc/nginx/locations/location-quartz-$NGINX_DOMAIN.conf
@@ -74,7 +86,7 @@ sudo nginx -t && sudo systemctl reload nginx
 
 # cd $DIR &&  npx quartz build  --serve --watch --port $PORT  -d $CONTENT
 
-docker run -v $CONTENT:$CONTENT -v $DIR:$DIR -w $DIR -p $PORT:$PORT --rm $DOCKER_TTY node:22 bash -c "npm install -g npm@11.2.0 && npm i && npx quartz build  --serve --watch --port $PORT  -d $CONTENT"
+docker run --name $CONATINER_NAME -v $CONTENT:$CONTENT -v $DIR:$DIR -w $DIR -p $PORT:$PORT --rm $DOCKER_TTY node:22 bash -c "npm install -g npm@11.2.0 && npm i && npx quartz build  --serve --watch --port $PORT  -d $CONTENT"
 
 #echo "commit github update"
 
